@@ -4,6 +4,7 @@ from scamsleuth.features.entities import (
     Entities,
     canonicalize,
     defang_email,
+    defang_text,
     defang_url,
     extract_entities,
     mask_entities,
@@ -194,3 +195,12 @@ def test_canonicalize_is_idempotent() -> None:
 )
 def test_mask_entities(text: str, expected: str) -> None:
     assert " ".join(mask_entities(text).split()) == expected
+
+
+def test_defang_text_neutralises_every_link() -> None:
+    text = "Pay at http:/evil.top/a.html or www.x.com, mail bob@evil.com; see days.so ok"
+    shown = defang_text(text)
+    assert shown == (
+        "Pay at hxxp://evil[.]top/a.html or www[.]x[.]com, mail bob[@]evil[.]com; see days.so ok"
+    )
+    assert "http" not in shown

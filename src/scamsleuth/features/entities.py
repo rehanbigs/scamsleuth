@@ -174,6 +174,22 @@ def mask_entities(text: str) -> str:
     )
 
 
+def defang_text(text: str) -> str:
+    """Canonicalise a message and defang every URL and email in place, for safe display."""
+    text = canonicalize(text)
+    text = _EMAIL.sub(lambda m: defang_email(m.group()), text)
+    for pattern in (_SCHEME_URL, _WWW_URL):
+        text = pattern.sub(lambda m: defang_url(m.group()), text)
+    return _BARE_URL.sub(
+        lambda m: (
+            defang_url(m.group())
+            if _is_plausible_bare_domain(m.group().rstrip(_TRAILING))
+            else m.group()
+        ),
+        text,
+    )
+
+
 def defang_url(url: str) -> str:
     """``https://evil.com/a.html`` -> ``hxxps://evil[.]com/a.html``."""
     scheme, sep, rest = url.partition("://")

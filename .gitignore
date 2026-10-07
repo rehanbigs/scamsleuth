@@ -16,7 +16,7 @@ htmlcov/
 # Secrets
 .env
 
-# Data and experiment artifacts (versioned on HF Hub, not Git)
+# Data, experiment artifacts and trained models (not stored in Git)
 /data/
 /mlruns/
 /mlflow.db
@@ -26,3 +26,5 @@ htmlcov/
 .ipynb_checkpoints/
 .vscode/
 .idea/
+/mlartifacts/
+/models/
