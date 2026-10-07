@@ -1,0 +1,74 @@
+[
+  {
+    "model": "naive_bayes",
+    "cv_pr_auc_mean": 0.9920756099767065,
+    "cv_pr_auc_std": 0.0008631492476314503,
+    "val_pr_auc": 0.9918644904416916,
+    "val_recall": 0.9568062827225131,
+    "val_fpr": 0.01884057971014493,
+    "val_macro_f1": 0.8621583803401984,
+    "val_recall_imc25": 0.9661368348306841,
+    "val_recall_mendeley": 0.7901234567901234,
+    "seconds": 26.16980234899529
+  },
+  {
+    "model": "logreg",
+    "cv_pr_auc_mean": 0.9946249325382641,
+    "cv_pr_auc_std": 0.0007506730358273537,
+    "val_pr_auc": 0.9942652029780438,
+    "val_recall": 0.9757853403141361,
+    "val_fpr": 0.01884057971014493,
+    "val_macro_f1": 0.8935895452469401,
+    "val_recall_imc25": 0.9827228749136143,
+    "val_recall_mendeley": 0.8518518518518519,
+    "seconds": 85.06943303899607
+  },
+  {
+    "model": "linear_svm",
+    "cv_pr_auc_mean": 0.9943084673689622,
+    "cv_pr_auc_std": 0.0008218403416587665,
+    "val_pr_auc": 0.9942657632462859,
+    "val_recall": 0.9757853403141361,
+    "val_fpr": 0.01884057971014493,
+    "val_macro_f1": 0.8764796641381482,
+    "val_recall_imc25": 0.9806496199032481,
+    "val_recall_mendeley": 0.8888888888888888,
+    "seconds": 33.10485066900583
+  },
+  {
+    "model": "lightgbm_lexical",
+    "cv_pr_auc_mean": 0.9712716535921786,
+    "cv_pr_auc_std": 0.0026388028362339475,
+    "val_pr_auc": 0.9740137026357831,
+    "val_recall": 0.8481675392670157,
+    "val_fpr": 0.01884057971014493,
+    "val_macro_f1": 0.7735178400392235,
+    "val_recall_imc25": 0.8590186592950932,
+    "val_recall_mendeley": 0.654320987654321,
+    "seconds": 23.716793043997313
+  },
+  {
+    "model": "stack_logreg_lightgbm",
+    "cv_pr_auc_mean": 0.993806097435,
+    "cv_pr_auc_std": 0.0011306234543658389,
+    "val_pr_auc": 0.9933404802089106,
+    "val_recall": 0.9790575916230366,
+    "val_fpr": 0.01884057971014493,
+    "val_macro_f1": 0.8930256748686297,
+    "val_recall_imc25": 0.9861782999308915,
+    "val_recall_mendeley": 0.8518518518518519,
+    "seconds": 787.1044625829963
+  },
+  {
+    "model": "logreg_trained_on_mendeley_only",
+    "cv_pr_auc_mean": NaN,
+    "cv_pr_auc_std": NaN,
+    "val_pr_auc": 0.9439962653590253,
+    "val_recall": 0.9509162303664922,
+    "val_fpr": 0.01884057971014493,
+    "val_macro_f1": 0.6988498483944623,
+    "val_recall_imc25": 0.9502418797512094,
+    "val_recall_mendeley": 0.9629629629629629,
+    "seconds": 6.6334909350043745
+  }
+]

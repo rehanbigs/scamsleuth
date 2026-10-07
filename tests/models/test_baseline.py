@@ -49,3 +49,15 @@ def test_smishing_scores_falls_back_to_decision_function() -> None:
     model = baseline.text_pipeline(LinearSVC()).fit(TEXTS, LABELS)
     scores = baseline.smishing_scores(model, TEXTS)
     assert scores[:3].min() > scores[6:].max()
+
+
+@pytest.mark.parametrize("name", sorted(baseline.CANDIDATES))
+def test_every_candidate_fits_and_ranks_scams_above_chat(name: str) -> None:
+    texts = TEXTS * 10  # enough rows for stacking's 5-fold CV and LightGBM's leaf minimum
+    labels = LABELS * 10
+    model = baseline.CANDIDATES[name]().fit(texts, labels)
+    scores = baseline.smishing_scores(model, TEXTS)
+
+    assert scores.shape == (len(TEXTS),)
+    assert baseline.score_matrix(model, TEXTS).shape == (len(TEXTS), 3)
+    assert scores[:3].mean() > scores[6:].mean()
