@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets
+.env
+
+# Data and experiment artifacts (versioned on HF Hub, not Git)
+data/
+mlruns/
+mlflow.db
+*.onnx
+
+# Notebooks / editors
+.ipynb_checkpoints/
+.vscode/
+.idea/

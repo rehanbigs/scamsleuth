@@ -1,0 +1,20 @@
+# Hooks run the tools pinned in the project venv (uv.lock), so pre-commit and CI use identical versions.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types_or: [python, pyi, jupyter]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types_or: [python, pyi, jupyter]
+      - id: mypy
+        name: mypy
+        entry: uv run mypy src tests
+        language: system
+        types: [python]
+        pass_filenames: false

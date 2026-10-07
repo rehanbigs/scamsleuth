@@ -1,0 +1,50 @@
+[project]
+name = "scamsleuth"
+version = "0.1.0"
+description = "Forensic AI analyst for suspicious SMS, WhatsApp and email messages."
+license = "MIT"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "datasets>=3.0",
+    "datasketch>=1.6",
+    "huggingface-hub>=0.25",
+    "pandas>=2.2",
+    "scikit-learn>=1.5",
+    "tldextract>=5.1",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+    "matplotlib>=3.9",
+    "mypy>=1.13",
+    "pandas-stubs>=2.2",
+    "pre-commit>=4.0",
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["datasets.*", "datasketch.*", "sklearn.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --cov=scamsleuth --cov-report=term-missing"
