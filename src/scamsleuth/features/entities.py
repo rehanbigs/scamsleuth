@@ -45,7 +45,7 @@ _DATE_TIME = re.compile(r"\b\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}\b|\b\d{1,2}:\d{2}(?:
 _PHONE = re.compile(r"(?<![\w+])(?:\+\d{1,3}[ -]?)?\(?\d{2,}\)?(?:[ -]\(?\d{2,}\)?)*(?!\w)")
 # Premium-rate short codes, only after a call to action: "Txt WIN to 87066", "send 2 No: 8883".
 _SHORT_CODE = re.compile(
-    r"\b(?:to|2|txt|text|send|sms|call|reply|dial)\b\W{0,3}(?:no\W{0,3})?(\d{4,6})(?!\w)",
+    r"\b(?:to|2|txt|text|send|sms|call|reply|dial)\b\W{0,3}(?:no\W{0,3})?(\d{4,6})(?!\w|[ -]\d)",
     re.IGNORECASE,
 )
 _TRAILING = ".,;:!?)]}'\"\u2026"

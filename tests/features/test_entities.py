@@ -129,6 +129,7 @@ def test_ignores_numbers_that_are_not_phones(text: str) -> None:
         ("text money 2 88600 now", ("88600",)),
         ("send it to No: 8883 CM", ("8883",)),
         ("I have 87066 reasons", ()),
+        ("call 0844 861 85 85 now", ()),  # start of a phone number
     ],
 )
 def test_extracts_short_codes_after_call_to_action(text: str, expected: tuple[str, ...]) -> None:
