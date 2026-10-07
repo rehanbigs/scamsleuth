@@ -26,6 +26,13 @@ dev = [
     "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
+train = [
+    "lightgbm>=4",
+    "mlflow>=3",
+]
+
+[tool.uv]
+default-groups = ["dev", "train"]
 
 [build-system]
 requires = ["hatchling"]
@@ -44,7 +51,7 @@ strict = true
 mypy_path = "src"
 
 [[tool.mypy.overrides]]
-module = ["datasets.*", "datasketch.*", "sklearn.*"]
+module = ["datasets.*", "datasketch.*", "sklearn.*", "lightgbm.*", "mlflow.*", "joblib.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
