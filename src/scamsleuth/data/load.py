@@ -31,6 +31,19 @@ class SchemaError(ValueError):
     """Raised when the raw file does not match the expected schema."""
 
 
+def fetch_verified(url: str, sha256: str) -> bytes:
+    """Download ``url`` and check its SHA-256, so every build uses identical source data."""
+    # Some hosts reject urllib's default User-Agent with HTTP 403.
+    request = urllib.request.Request(url, headers={"User-Agent": "scamsleuth/0.1"})
+    with urllib.request.urlopen(request, timeout=120) as response:
+        payload: bytes = response.read()
+
+    digest = hashlib.sha256(payload).hexdigest()
+    if digest != sha256:
+        raise SchemaError(f"checksum mismatch for {url}: expected {sha256}, got {digest}")
+    return payload
+
+
 def download_raw(dest_dir: Path, *, url: str = SOURCE_URL) -> Path:
     """Download the dataset archive, verify its checksum and extract the CSV.
 
@@ -41,15 +54,7 @@ def download_raw(dest_dir: Path, *, url: str = SOURCE_URL) -> Path:
     if csv_path.exists():
         return csv_path
 
-    # The host rejects urllib's default User-Agent with HTTP 403.
-    request = urllib.request.Request(url, headers={"User-Agent": "scamsleuth/0.1"})
-    with urllib.request.urlopen(request, timeout=60) as response:
-        payload: bytes = response.read()
-
-    digest = hashlib.sha256(payload).hexdigest()
-    if digest != SOURCE_SHA256:
-        raise SchemaError(f"checksum mismatch: expected {SOURCE_SHA256}, got {digest}")
-
+    payload = fetch_verified(url, SOURCE_SHA256)
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
         csv_path.write_bytes(archive.read(SOURCE_MEMBER))
     return csv_path

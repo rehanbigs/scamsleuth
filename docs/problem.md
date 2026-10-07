@@ -81,9 +81,12 @@ These are hard rules, enforced in code rather than left to a model's judgement:
 
 ## Known risks and limitations
 
-- **Dataset age and coverage.** The training data was published in 2022 and is mostly
-  English. Newer scam types (unpaid tolls, task scams) may be under-represented, so results
-  on recent messages are reported separately.
+- **Dataset age and coverage.** The classic labelled corpus is from 2022 and is dominated by
+  feature-phone-era prize scams. Training therefore adds real 2017–2024 smishing reports, and
+  results are reported separately per source and per scam type.
+- **No modern legitimate notifications.** Real bank and courier messages are private, so all
+  legitimate training messages are personal chat. False alarms on official-looking genuine
+  messages are measured on a synthetic look-alike set.
 - **Label noise.** Some identical messages carry different labels in the source data (see
   [data.md](data.md)).
 - **Adversarial drift.** Scammers change wording to evade filters; robustness to obfuscation

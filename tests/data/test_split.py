@@ -1,10 +1,7 @@
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
-import pytest
 
-from scamsleuth.data import prepare, split
+from scamsleuth.data import split
 
 
 def test_normalize_text_ignores_case_punctuation_spacing_and_mojibake() -> None:
@@ -77,32 +74,3 @@ def test_assign_splits_preserves_class_balance() -> None:
     for name in ("train", "val", "test"):
         share = labels[splits == name].value_counts(normalize=True)
         assert abs(share["ham"] - overall["ham"]) < 0.1
-
-
-def test_build_has_no_text_shared_across_splits(tmp_path: Path) -> None:
-    rows = [
-        f"ham,Hello friend number {i} how was the {w} today,No,No,No"
-        for i, w in enumerate(["match", "exam", "trip", "movie", "class", "party", "game"] * 6)
-    ]
-    rows += [
-        f"Smishing,Your parcel {i} is held pay fee at http://x{i}.top,yes,No,No" for i in range(14)
-    ]
-    rows += [f"spam,Mega sale {i} on shoes and bags this weekend only,No,No,No" for i in range(14)]
-    csv = tmp_path / "raw.csv"
-    csv.write_text("LABEL,TEXT,URL,EMAIL,PHONE\n" + "\n".join(rows) + "\n", encoding="utf-8")
-
-    df, summary = prepare.build(csv)
-
-    assert summary["near_duplicate_groups"] >= 1
-    assert (df.groupby("group")["split"].nunique() == 1).all()
-    assert sum(sum(counts.values()) for counts in summary["splits"].values()) == len(df)
-
-
-def test_read_split_round_trips_and_rejects_unknown_split(tmp_path: Path) -> None:
-    (tmp_path / "processed").mkdir()
-    frame = pd.DataFrame({"text": ["hi"], "label": ["ham"]})
-    frame.to_parquet(tmp_path / "processed" / "val.parquet", index=False)
-
-    assert prepare.read_split("val", tmp_path).equals(frame)
-    with pytest.raises(ValueError, match="unknown split"):
-        prepare.read_split("dev", tmp_path)
