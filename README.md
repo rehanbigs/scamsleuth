@@ -13,9 +13,9 @@ away, and what to do next.
 
 ## Highlights
 
-- **Leakage-safe dataset pipeline.** Downloads a public SMS phishing corpus, verifies its
-  checksum, removes 146 duplicates, resolves 35 conflicting labels, and groups near-duplicate
-  templates with MinHash LSH so that no variant leaks from training into test.
+- **Modern, leakage-safe data.** Combines a classic labelled corpus with 10k real smishing
+  reports from 2017–2024. It removes 6,172 duplicates and groups near-duplicate campaign
+  templates with MinHash LSH, so that no variant leaks from training into test.
 - **Adversarial-aware entity extraction.** Finds URLs, emails, phone numbers and premium SMS
   short codes, even when scammers hide them behind zero-width characters, full-width dots,
   broken schemes (`http:/bit.do/...`) or defanged text, and recovers 99% of annotated links in
@@ -23,7 +23,7 @@ away, and what to do next.
 - **Safe by construction.** Suspicious links are parsed as text only. They are never fetched
   or rendered, and they are always shown defanged (`hxxp://evil[.]com`).
 - **Measured, not guessed.** Success is defined up front as smishing recall at a fixed
-  false-alarm rate, because accuracy is misleading on data that is 81% legitimate.
+  false-alarm rate, because a missed scam costs far more than a false alarm.
 
 ## Quickstart
 
@@ -48,18 +48,24 @@ Entities(urls=('hxxp://parcel-fee[.]top/pay',), emails=(), phones=('08448618585'
 
 ## Dataset
 
-[SMS Phishing Dataset](https://doi.org/10.17632/f45bkkt8pr.1) by Mishra & Soni (2022),
-CC BY 4.0: 5,971 messages labelled `ham`, `spam` or `smishing`.
+| Source | Messages | Role |
+|---|---:|---|
+| [Mendeley SMS Phishing Dataset](https://doi.org/10.17632/f45bkkt8pr.1) (2022) | 5,825 | Labelled `ham` / `spam` / `smishing` corpus |
+| [IMC 2025 smishing reports](https://github.com/reportsmishing/Smishing-Dataset-IMC25) (2017–2024) | 11,280 | Real modern scams: banking, delivery, government, telecom, "Hey Mum" |
+| IMC 2025, non-English | 6,805 | Evaluation only: 58 languages |
+| [Synthetic hard negatives](https://huggingface.co/datasets/Ridham115/indian-scam-sms-synthetic-audited) | 1,580 | Evaluation only: false alarms on genuine bank, courier and bill look-alikes |
+
+All sources are CC BY 4.0 and are pinned and checksum-verified at build time.
 
 | Split | ham | spam | smishing | Total |
 |---|---:|---:|---:|---:|
-| train | 3,449 | 310 | 402 | 4,161 |
-| val | 690 | 62 | 80 | 832 |
-| test | 690 | 62 | 80 | 832 |
+| train | 3,449 | 1,133 | 7,634 | 12,216 |
+| val | 690 | 227 | 1,528 | 2,445 |
+| test | 690 | 227 | 1,527 | 2,444 |
 
-Splits are stratified by class and grouped by near-duplicate template. The full processing
-steps, quality issues and limitations are in the [data card](docs/data.md), and the analysis
-is in the [EDA notebook](notebooks/01_eda.ipynb).
+Splits are stratified by source and class and grouped by near-duplicate template, with zero
+overlap between them. The processing steps, cleaning rules and limitations are in the
+[data card](docs/data.md), and the analysis is in the [EDA notebook](notebooks/01_eda.ipynb).
 
 ## Project layout
 
