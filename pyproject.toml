@@ -47,4 +47,4 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --cov=scamsleuth --cov-report=term-missing"
+addopts = "-q --import-mode=importlib --cov=scamsleuth --cov-report=term-missing"

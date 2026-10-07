@@ -17,9 +17,9 @@ htmlcov/
 .env
 
 # Data and experiment artifacts (versioned on HF Hub, not Git)
-data/
-mlruns/
-mlflow.db
+/data/
+/mlruns/
+/mlflow.db
 *.onnx
 
 # Notebooks / editors
