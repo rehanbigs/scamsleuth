@@ -24,6 +24,8 @@ away, and what to do next.
   or rendered, and they are always shown defanged (`hxxp://evil[.]com`).
 - **Measured, not guessed.** Success is defined up front as smishing recall at a fixed
   false-alarm rate, because a missed scam costs far more than a false alarm.
+- **Honest evaluation.** Results are reported per source and per scam type, with confidence
+  intervals, and stress-tested on unseen languages and on genuine messages that look official.
 
 ## Quickstart
 
@@ -33,7 +35,9 @@ Requires [uv](https://docs.astral.sh/uv/).
 git clone https://github.com/rehanbigs/scamsleuth.git
 cd scamsleuth
 uv sync                                   # create the environment
-uv run python -m scamsleuth.data.prepare  # download, clean and split the dataset
+uv run python -m scamsleuth.data.prepare  # download, clean and split the datasets
+uv run python -m scamsleuth.models.compare  # compare candidate models (logged to MLflow)
+uv run python -m scamsleuth.models.train  # tune, calibrate, evaluate, save models/baseline.joblib
 uv run pytest                             # run the test suite
 ```
 
@@ -67,14 +71,58 @@ Splits are stratified by source and class and grouped by near-duplicate template
 overlap between them. The processing steps, cleaning rules and limitations are in the
 [data card](docs/data.md), and the analysis is in the [EDA notebook](notebooks/01_eda.ipynb).
 
+## Results
+
+**Baseline: TF-IDF (word + character n-grams) + logistic regression**, isotonic-calibrated, with
+the decision threshold set on validation for a 2% false-alarm budget. Test results, evaluated once:
+
+| Evaluation | Measure | Result |
+|---|---|---:|
+| Test, all sources (2,444 messages) | Smishing recall | **97.7%** (95% CI 96.9–98.4) |
+| | False-alarm rate on legitimate messages | 2.6% (target 2.0%) |
+| | Smishing PR-AUC · macro F1 | 0.994 · 0.869 |
+| Test, real 2017–2024 scams (IMC) | Smishing recall | 98.1% |
+| | "Wrong number" conversational scams | 36% (9 of 25) |
+| Test, 2022 corpus | Smishing recall | 91.3% (95% CI 85.0–97.5) |
+| Unseen languages (6,805 scams, 58 languages) | Smishing recall | 76.7% (French 94%, German 50%, Japanese 27%) |
+| Synthetic genuine look-alikes (783) | Wrongly flagged as smishing | **81.7%** |
+
+The last row is the important limitation: every legitimate training message is personal chat, so
+the model treats anything official-looking as a scam. It is the main target for the next model.
+The [error analysis](reports/baseline_errors.md) explains the remaining mistakes.
+
+<p>
+  <img src="reports/figures/confusion_test.png" width="32%" alt="Confusion matrix on the test split">
+  <img src="reports/figures/pr_curve.png" width="32%" alt="Precision-recall curves for validation and test">
+  <img src="reports/figures/reliability.png" width="32%" alt="Reliability diagram before and after calibration">
+</p>
+
+### Model comparison (validation, 5-fold grouped CV on train)
+
+| Model | CV PR-AUC | Recall at 2% false alarms | Macro F1 | Fit + CV time |
+|---|---:|---:|---:|---:|
+| Complement Naive Bayes | 0.992 | 95.7% | 0.862 | 26 s |
+| **Logistic regression** | **0.995** | **97.6%** | **0.894** | 85 s |
+| Linear SVM | 0.994 | 97.6% | 0.876 | 33 s |
+| LightGBM on 17 red-flag features | 0.971 | 84.8% | 0.774 | 24 s |
+| Stack (logistic regression + LightGBM) | 0.994 | 97.9% | 0.893 | 787 s |
+| Logistic regression trained on 2022 data only | — | 95.1% | 0.699 | 7 s |
+
+Logistic regression is kept: it ties for best and runs fast, and the stack adds about 3 caught
+scams out of 1,528 at 9× the cost. Training on 2022 data alone keeps recall high but collapses
+macro F1, because it cannot separate modern spam from smishing. Every run is tracked in MLflow.
+
 ## Project layout
 
 ```
 src/scamsleuth/
-├── data/        # download, validation, de-duplication, splitting
-└── features/    # entity extraction and defanging
+├── data/        # download, validation, cleaning, de-duplication, splitting
+├── features/    # entity extraction, defanging, red-flag features
+├── models/      # candidate models, comparison, final training
+└── eval/        # metrics, figures, error analysis
 tests/           # unit tests (pytest)
 notebooks/       # exploratory analysis
+reports/         # metrics, figures, error analysis
 docs/            # problem statement and data card
 ```
 
@@ -82,6 +130,7 @@ docs/            # problem statement and data card
 
 - [Problem statement and success metrics](docs/problem.md)
 - [Data card](docs/data.md)
+- [Error analysis](reports/baseline_errors.md)
 
 ## Development
 
