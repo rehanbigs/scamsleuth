@@ -6,6 +6,7 @@ from scamsleuth.features.entities import (
     defang_email,
     defang_url,
     extract_entities,
+    mask_entities,
 )
 
 # --- URLs -----------------------------------------------------------------------------
@@ -176,3 +177,20 @@ def test_canonicalize_is_idempotent() -> None:
     once = canonicalize(text)
     assert once == "http://evil.com A"
     assert canonicalize(once) == once
+
+
+# --- Masking --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Pay at http:/parcel-fee[.]top/pay now", "Pay at xxurl now"),
+        ("call 0844 861 85 85 on 29-11-2016", "call xxphone on xxdate"),
+        ("Txt MUSIC to 87066 TnCs", "Txt MUSIC to xxshortcode TnCs"),
+        ("mail bob@evil.com or see www.dbuk.net", "mail xxemail or see xxurl"),
+        ("see you in 2 days.so be ready, Rs.3 only", "see you in 2 days.so be ready, Rs.3 only"),
+    ],
+)
+def test_mask_entities(text: str, expected: str) -> None:
+    assert " ".join(mask_entities(text).split()) == expected

@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from scamsleuth.data import prepare, split
 
@@ -95,3 +96,13 @@ def test_build_has_no_text_shared_across_splits(tmp_path: Path) -> None:
     assert summary["near_duplicate_groups"] >= 1
     assert (df.groupby("group")["split"].nunique() == 1).all()
     assert sum(sum(counts.values()) for counts in summary["splits"].values()) == len(df)
+
+
+def test_read_split_round_trips_and_rejects_unknown_split(tmp_path: Path) -> None:
+    (tmp_path / "processed").mkdir()
+    frame = pd.DataFrame({"text": ["hi"], "label": ["ham"]})
+    frame.to_parquet(tmp_path / "processed" / "val.parquet", index=False)
+
+    assert prepare.read_split("val", tmp_path).equals(frame)
+    with pytest.raises(ValueError, match="unknown split"):
+        prepare.read_split("dev", tmp_path)

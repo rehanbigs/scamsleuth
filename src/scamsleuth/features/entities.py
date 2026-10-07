@@ -146,6 +146,34 @@ def extract_entities(text: str) -> Entities:
     )
 
 
+def mask_entities(text: str) -> str:
+    """Canonicalise text and replace entities with placeholder tokens, for modelling.
+
+    A specific URL or phone number rarely repeats across scam campaigns, but the fact that
+    a message contains one is a strong signal. Masking lets a bag-of-words model learn the
+    signal instead of memorising the values.
+    """
+    text = canonicalize(text)
+    text = _EMAIL.sub(" xxemail ", text)
+    for pattern in (_SCHEME_URL, _WWW_URL):
+        text = pattern.sub(" xxurl ", text)
+    text = _BARE_URL.sub(
+        lambda m: (
+            " xxurl " if _is_plausible_bare_domain(m.group().rstrip(_TRAILING)) else m.group()
+        ),
+        text,
+    )
+    text = _DATE_TIME.sub(" xxdate ", text)
+    text = _SHORT_CODE.sub(
+        lambda m: m.group()[: m.start(1) - m.start()] + " xxshortcode ",
+        text,
+    )
+    return _PHONE.sub(
+        lambda m: " xxphone " if 7 <= len(re.sub(r"\D", "", m.group())) <= 15 else m.group(),
+        text,
+    )
+
+
 def defang_url(url: str) -> str:
     """``https://evil.com/a.html`` -> ``hxxps://evil[.]com/a.html``."""
     scheme, sep, rest = url.partition("://")
