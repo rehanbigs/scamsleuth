@@ -39,6 +39,13 @@ def build(raw_csv: Path, *, seed: int = 42) -> tuple[pd.DataFrame, dict[str, Any
     return df, summary
 
 
+def read_split(split: str, data_dir: Path = Path("data")) -> pd.DataFrame:
+    """Load one processed split written by :func:`main`."""
+    if split not in SPLITS:
+        raise ValueError(f"unknown split {split!r}; expected one of {SPLITS}")
+    return pd.read_parquet(data_dir / "processed" / f"{split}.parquet")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
